@@ -1,7 +1,7 @@
 import { prisma } from "@repo/database";
 
 export default async function IndexPage() {
-  console.log(prisma._engineConfig)
+  console.log(prisma)
 
   return (
     <div>
