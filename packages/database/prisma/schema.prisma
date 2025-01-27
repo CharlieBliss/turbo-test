@@ -1,19 +1,229 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
 
 generator client {
   provider = "prisma-client-js"
   output = "../generated/client"
+  previewFeatures = ["fullTextSearch"]
+
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
+  id             String         @id @default(cuid())
+  name           String?        @db.VarChar(25)
+  email          String?        @unique
+  emailVerified  DateTime?
+  image          String?
+  updated_on     DateTime?      @db.Timestamp(6)
+  role           String         @default("user")
+  accounts       Account[]
+  sessions       Session[]
+  campaigns      Campaign[]
+  user_campaigns UserCampaign[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model EventPublishProvider {
+  id          String    @id @default(cuid())
+  provider    String
+  url         String
+  campaign    Campaign? @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade)
+  campaign_id String
+}
+
+model Campaign {
+  campaign_id            String                 @id @default(cuid())
+  title                  String                 @db.VarChar(50)
+  description            String                 @db.VarChar(1000)
+  image                  String?                @db.VarChar(500)
+  header_image           String?                @db.VarChar(500)
+  allow_ai_events        Boolean                @default(false)
+  node_types             NodeType[]
+  users                  User[]
+  static_maps            StaticMap[]
+  overview_map_id        String?                @db.VarChar(50)
+  session_recaps         SessionRecap[]
+  nodes                  Node[]
+  event_templates        EventTemplate[]
+  event_publish_provider EventPublishProvider[]
+  user_campaigns         UserCampaign[]
+  created_on             DateTime               @default(now()) @db.Timestamp(6)
+}
+
+model UserCampaign {
+  user_campaign_id String   @id @default(cuid())
+  user_id          String
+  campaign_id      String
+  user             User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  campaign         Campaign @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade)
+  created_on       DateTime @default(now()) @db.Timestamp(6)
+  updated_on       DateTime @default(now()) @db.Timestamp(6)
+  last_visited_on  DateTime @default(now()) @db.Timestamp(6)
+}
+
+model EventTemplate {
+  event_template_id   String    @id @default(cuid())
+  title               String    @db.VarChar(100)
+  description         String    @db.VarChar(500)
+  type                String    @db.VarChar(50)
+  icon_url            String    @db.VarChar(100)
+  rarity              Int       @default(100)
+  relationship        String?   @db.VarChar(50)
+  compare             String?   @db.VarChar(50)
+  exclude_from_random Boolean?
+  results             Json
+  campaign_id         String?
+  node_references     String?
+  campaign            Campaign? @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade)
+}
+
+model Event {
+  event_id    String   @id @default(cuid())
+  name        String   @db.VarChar(500)
+  description String?  @db.VarChar(1000)
+  type        String?  @db.VarChar(50)
+  rarity      Int      @default(100)
+  created_on  DateTime @default(now()) @db.Timestamp(6)
+  updated_on  DateTime @default(now()) @db.Timestamp(6)
+  nodes       Node[]
+}
+
+model StaticMap {
+  map_id      String    @id @default(cuid())
+  name        String    @db.VarChar(50)
+  image_url   String    @db.VarChar(500)
+  created_on  DateTime  @default(now()) @db.Timestamp(6)
+  updated_on  DateTime  @default(now()) @db.Timestamp(6)
+  campaign_id String?
+  campaign    Campaign? @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade)
+  map_nodes   MapNode[]
+}
+
+model NodeType {
+  node_type_id       String   @id @default(cuid())
+  name               String   @db.VarChar(50)
+  allowed_attributes String[]
+  campaign           Campaign @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade)
+  campaign_id        String
+  nodes              Node[]
+}
+
+model Attribute {
+  attribute_id String @id @default(cuid())
+  title        String @db.VarChar(50)
+  value        Int    @default(50)
+  node_id      String
+  nodes        Node   @relation(fields: [node_id], references: [node_id], onDelete: Cascade)
+}
+
+model Node {
+  node_id             String             @id @default(cuid())
+  name                String             @db.VarChar(50)
+  description         String?            @db.VarChar(1000)
+  long_description    String?            @db.VarChar(50000)
+  image_url           String?            @db.VarChar(100)
+  attributes          Attribute[]
+  created_on          DateTime           @default(now()) @db.Timestamp(6)
+  updated_on          DateTime           @default(now()) @db.Timestamp(6)
+  base_culture        String?            @db.VarChar(50)
+  profession          String?            @db.VarChar(50)
+  given_name_style    String?            @db.VarChar(50)
+  family_name_style   String?            @db.VarChar(50)
+  name_shape          String?            @db.VarChar(50)
+  events              Event[]
+  campaign_id         String?
+  campaign            Campaign?          @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade)
+  // Outgoing, like following, "how I relate to others"
+  outgoing_relations  NodeRelationship[] @relation("outgoing_relations")
+  // Incoming, like followers, "how others relate to me"
+  incoming_relations  NodeRelationship[] @relation("incoming_relations")
+  node_type           NodeType?          @relation(fields: [node_type_id], references: [node_type_id])
+  node_type_id        String?
+  exclude_from_events Boolean?
+  map_node            MapNode[]
+}
+
+model MapNode {
+  map_node_id String    @id @default(cuid())
+  coordinates Int[]
+  moveable    Boolean?
+  title       String?   @db.VarChar(100)
+  description String?   @db.VarChar(1000)
+  icon_url    String?   @db.VarChar(100)
+  icon        String?   @db.VarChar(100)
+  created_on  DateTime  @default(now()) @db.Timestamp(6)
+  updated_on  DateTime  @default(now()) @db.Timestamp(6)
+  map_id      String
+  map         StaticMap @relation(fields: [map_id], references: [map_id], onDelete: Cascade)
+  node_id     String?
+  node        Node?     @relation(fields: [node_id], references: [node_id], onDelete: Cascade)
+}
+
+model NodeRelationship {
+  node_relationship_id String   @id @default(cuid())
+  outgoing_relations   Node     @relation("outgoing_relations", fields: [self_id], references: [node_id])
+  // self_id: Id of the node that this relationship is coming from
+  self_id              String
+  relation_title       String
+  incoming_relations   Node     @relation("incoming_relations", fields: [target_id], references: [node_id])
+  // target_id: Id of the node that this relationship is going to
+  target_id            String
+  relationship_score   Int
+  is_in_range          Boolean?
+  updated_on           DateTime @default(now()) @db.Timestamp(6)
+
+  @@unique([self_id, target_id])
+}
+
+model SessionRecap {
+  session_recap_id String    @id @default(cuid())
+  title            String    @db.VarChar(500)
+  description      String?   @db.VarChar(50000)
+  play_date        DateTime  @default(now()) @db.Timestamp(6)
+  created_on       DateTime  @default(now()) @db.Timestamp(6)
+  updated_on       DateTime  @default(now()) @db.Timestamp(6)
+  campaign_id      String?
+  campaign         Campaign? @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade)
+  published_on     DateTime? @db.Timestamp(6)
 }
