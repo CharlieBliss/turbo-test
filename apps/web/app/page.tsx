@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react";
+import { User } from "@repo/database";
 
 
 const fetchStuff = async (setUsersJson: any) => {
@@ -23,7 +24,7 @@ export default function IndexPage() {
   return (
     <div>
       <h1>Hello World</h1>
-      {usersJson.body.map((jUser: any) => (
+      {usersJson.body.map((jUser: User) => (
         <div key={jUser.id}>{jUser.name}</div>
       ))}
     </div>
