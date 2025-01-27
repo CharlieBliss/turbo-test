@@ -1,10 +1,22 @@
 import { prisma } from '@repo/database';
-import { NextApiHandler } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 
+// GET handler to retrieve a user by ID
+export async function GET(
+  _: NextRequest,
+): Promise<NextResponse> {
 
-const userHandler: NextApiHandler = async (req, res) => {
-  const users = await prisma.user.findMany();
-  res.json(users);
-};
+	try {
+	  const users = await prisma.user.findMany();
 
-export default userHandler;
+    return NextResponse.json({
+      status: 200,
+      body: users,
+    });
+  } catch (error) {
+    return NextResponse.json({
+      status: 400,
+      body: error,
+    });
+  }
+}
