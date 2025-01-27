@@ -4,19 +4,19 @@ import { User } from "@repo/database";
 
 
 const fetchStuff = async (setUsersJson: any) => {
-  let userFetch = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/users");
+  let userFetch = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/users-test");
   let usersJson
   if(userFetch.ok) {
     console.log("???")
     usersJson = await userFetch.json()
     console.log(usersJson)
   } else {
-    usersJson = {body: []}
+    usersJson = []
   }
   return setUsersJson(usersJson)
 }
 export default function IndexPage() {
-  const [usersJson, setUsersJson] = useState({ body: [] });
+  const [usersJson, setUsersJson] = useState([]);
   useEffect (( )=> {
     console.log("HELLO???")
     fetchStuff(setUsersJson)
@@ -24,7 +24,7 @@ export default function IndexPage() {
   return (
     <div>
       <h1>Hello World</h1>
-      {usersJson.body.map((jUser: User) => (
+      {usersJson.map((jUser: User) => (
         <div key={jUser.id}>{jUser.name}</div>
       ))}
     </div>
