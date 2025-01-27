@@ -7,7 +7,6 @@ export async function GET(
 ): Promise<NextResponse> {
 	try {
 	  const users = await prisma.user.findMany();
-		console.log(users)
     return NextResponse.json({
       status: 200,
       body: users,

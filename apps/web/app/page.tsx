@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 const fetchStuff = async (setUsersJson: any) => {
   let userFetch = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/users");
   let usersJson
-  if(!userFetch.ok) {
-    usersJson = await userFetch.json();
-    console.log("PAGE LEVEL", usersJson)
+  if(userFetch.ok) {
+    console.log("???")
+    usersJson = await userFetch.json()
+    console.log(usersJson)
   } else {
     usersJson = {body: []}
   }
@@ -15,7 +16,8 @@ const fetchStuff = async (setUsersJson: any) => {
 }
 export default function IndexPage() {
   const [usersJson, setUsersJson] = useState({ body: [] });
-  useEffect (( )=>{
+  useEffect (( )=> {
+    console.log("HELLO???")
     fetchStuff(setUsersJson)
   }, [])
   return (
