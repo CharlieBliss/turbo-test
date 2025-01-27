@@ -3,5 +3,5 @@
  */
 module.exports = {
   reactStrictMode: true,
-  transpilePackages: ['@repo/database'],
+  transpilePackages: ['@repo/db'],
 };
