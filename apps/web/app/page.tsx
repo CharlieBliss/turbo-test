@@ -17,7 +17,7 @@ export default function IndexPage() {
   const [usersJson, setUsersJson] = useState({ body: [] });
   useEffect (( )=>{
     fetchStuff(setUsersJson)
-  })
+  }, [])
   return (
     <div>
       <h1>Hello World</h1>
