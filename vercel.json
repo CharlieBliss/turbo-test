@@ -1,10 +1,10 @@
 {
   "functions": {
     "api/**/*.js": {
-      "includeFiles": ["tmp/**/*"]
+      "includeFiles": "tmp/**/*"
     },
     "api/**/*.ts": {
-      "includeFiles": ["tmp/**/*"]
+      "includeFiles": "tmp/**/*"
     }
   }
 }
