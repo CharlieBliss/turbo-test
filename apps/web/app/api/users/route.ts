@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(
   _: NextRequest,
 ): Promise<NextResponse> {
-
 	try {
 	  const users = await prisma.user.findMany();
 
