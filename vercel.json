@@ -6,5 +6,6 @@
     "api/**/*.ts": {
       "includeFiles": "tmp/**/*"
     }
-  }
+  },
+  "buildCommand": "pnpm run build"
 }
