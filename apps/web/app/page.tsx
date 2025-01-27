@@ -1,3 +1,4 @@
+'use client'
 import { prisma } from "@repo/database";
 
 export default async function IndexPage() {
