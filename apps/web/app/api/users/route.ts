@@ -7,12 +7,13 @@ export async function GET(
 ): Promise<NextResponse> {
 	try {
 	  const users = await prisma.user.findMany();
-
+		console.log(users)
     return NextResponse.json({
       status: 200,
       body: users,
     });
   } catch (error) {
+	console.log(error)
     return NextResponse.json({
       status: 400,
       body: error,

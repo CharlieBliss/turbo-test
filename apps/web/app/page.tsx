@@ -2,9 +2,14 @@ import { prisma } from "@repo/database";
 
 export default async function IndexPage() {
   const users = await prisma.user.findMany();
-  const userFetch = await fetch(process.env.BASE_URL + "/api/users");
-  const usersJson = await userFetch.json();
+  let userFetch = await fetch(process.env.BASE_URL + "/api/users");
+  let usersJson
+  if(!userFetch.ok) {
+    usersJson = await userFetch.json();
   console.log(usersJson)
+  } else {
+    usersJson = {body: []}
+  }
   return (
     <div>
       <h1>Hello World</h1>
