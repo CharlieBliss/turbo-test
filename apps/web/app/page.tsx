@@ -1,3 +1,4 @@
+"use client"
 import { useEffect, useState } from "react";
 
 
@@ -12,7 +13,7 @@ const fetchStuff = async (setUsersJson: any) => {
   }
   return setUsersJson(usersJson)
 }
-export default async function IndexPage() {
+export default function IndexPage() {
   const [usersJson, setUsersJson] = useState({ body: [] });
   useEffect (( )=>{
     fetchStuff(setUsersJson)
