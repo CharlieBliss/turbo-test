@@ -1,7 +1,7 @@
 "use client"
 
 export default async function IndexPage() {
-  let userFetch = await fetch(process.env.BASE_URL + "/api/users");
+  let userFetch = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api/users");
   let usersJson
   if(!userFetch.ok) {
     usersJson = await userFetch.json();
