@@ -1,5 +1,10 @@
 {
-  "build": {
-    "includeFiles": ["tmp/**/*"]
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": ["tmp/**/*"]
+    },
+    "api/**/*.ts": {
+      "includeFiles": ["tmp/**/*"]
+    }
   }
 }

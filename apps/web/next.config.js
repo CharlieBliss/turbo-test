@@ -6,6 +6,6 @@ module.exports = {
   transpilePackages: ['@repo/db'],
   experimental: {
     outputFileTracingIncludes: {
-    '/api/users-test': ['./tmp/prisma-engines/**'],
+    '/api/users-test': ['./tmp/prisma-engines/**/*'],
   }}
 };
